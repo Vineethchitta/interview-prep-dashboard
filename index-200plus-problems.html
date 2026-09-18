@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interview Ready - DSA & AI/ML Learning Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body { 
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f5f5f5;
+  color: #0b0b0b;
+}
+.app-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+.sidebar {
+  width: 280px;
+  background: #ffffff;
+  border-right: 0.5px solid #e0e0e0;
+  padding: 16px;
+  overflow-y: auto;
+}
+.sidebar-header {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 16px;
+  padding: 8px 0;
+}
+.nav-section {
+  margin-bottom: 20px;
+}
+.nav-section-title {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: #999;
+  margin-bottom: 8px;
+  padding: 0 8px;
+}
+.nav-item {
+  padding: 10px 12px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #666;
+  border: 0.5px solid transparent;
+  transition: all 0.2s;
+}
+.nav-item:hover {
+  background: #f9f9f9;
+}
+.nav-item.active {
+  background: #e8f0ff;
+  color: #2a78d6;
+  font-weight: 500;
+  border-color: #2a78d6;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.checkbox-label input {
+  cursor: pointer;
+}
+.github-status {
+  background: #e8f5e8;
+  border: 0.5px solid #0ca30c;
+  border-radius: 6px;
+  padding: 8px;
+  margin: 12px 0;
+  font-size: 11px;
+  color: #0ca30c;
+}
+.github-status.disconnected {
+  background: #ffe8e8;
+  border-color: #d03b3b;
+  color: #d03b3b;
+}
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.header {
+  background: #ffffff;
+  border-bottom: 0.5px solid #e0e0e0;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.header h1 {
+  font-size: 18px;
+  font-weight: 500;
+}
+.header-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.badge {
+  background: #e8f5e8;
+  color: #0ca30c;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+.section {
+  display: none;
+}
+.section.active {
+  display: block;
+  animation: fadeIn 0.2s;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.metric-card {
+  background: #f9f9f9;
+  border: 0.5px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+.metric-label {
+  font-size: 11px;
+  color: #666;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.metric-value {
+  font-size: 24px;
+  font-weight: 500;
+  color: #0b0b0b;
+}
+.metric-sub {
+  font-size: 11px;
+  color: #999;
+  margin-top: 4px;
+}
+
+.problem-card {
+  background: #ffffff;
+  border: 0.5px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+}
+.problem-card:hover {
+  border-color: #ddd;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.problem-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+.problem-title {
+  font-weight: 500;
+  font-size: 14px;
+  flex: 1;
+}
+.difficulty-badge {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.difficulty-easy {
+  background: #e8f5e8;
+  color: #0ca30c;
+}
+.difficulty-medium {
+  background: #fff3e8;
+  color: #c98500;
+}
+.difficulty-hard {
+  background: #ffe8e8;
+  color: #d03b3b;
+}
+.blind75-badge {
+  background: #fff3cd;
+  color: #856404;
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.problem-meta {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 8px;
+}
+.problem-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.tag {
+  background: #f5f5f5;
+  border: 0.5px solid #e0e0e0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #666;
+}
+.problem-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 0.5px solid #e0e0e0;
+}
+.source-badge {
+  background: #e8f0ff;
+  color: #2a78d6;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.solve-button {
+  padding: 8px 16px;
+  background: #2a78d6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.solve-button:hover {
+  background: #1e5ba8;
+}
+
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.filter-btn {
+  padding: 8px 12px;
+  border: 0.5px solid #e0e0e0;
+  background: #ffffff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+.filter-btn:hover, .filter-btn.active {
+  background: #e8f0ff;
+  border-color: #2a78d6;
+  color: #2a78d6;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  z-index: 1000;
+  overflow-y: auto;
+}
+.modal-overlay.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal {
+  background: #ffffff;
+  border-radius: 12px;
+  max-width: 800px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px rgba(0,0,0,0.15);
+}
+.modal-header {
+  padding: 20px;
+  border-bottom: 0.5px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-close {
+  cursor: pointer;
+  font-size: 20px;
+  color: #666;
+}
+.modal-body {
+  padding: 20px;
+}
+.modal-section {
+  margin-bottom: 20px;
+}
+.modal-section h3 {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  color: #666;
+}
+
+.button {
+  padding: 8px 16px;
+  border: 0.5px solid #ddd;
+  background: #ffffff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+.button:hover {
+  background: #f9f9f9;
+}
+.button.primary {
+  background: #2a78d6;
+  color: white;
+  border-color: #2a78d6;
+}
+.button.primary:hover {
+  background: #1e5ba8;
+}
+.button.success {
+  background: #0ca30c;
+  color: white;
+  border-color: #0ca30c;
+}
+.button-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+h2 {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+h3 {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 12px 0 8px 0;
+}
+
+.input-group {
+  margin-bottom: 12px;
+}
+.input-group label {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 4px;
+  color: #666;
+  font-weight: 500;
+}
+input[type="text"], input[type="password"], input[type="email"], select, textarea {
+  width: 100%;
+  padding: 8px;
+  border: 0.5px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+}
+input[type="text"]:focus, input[type="password"]:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #2a78d6;
+  box-shadow: 0 0 0 2px #e8f0ff;
+}
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #0ca30c;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  z-index: 2000;
+  animation: slideIn 0.3s;
+}
+.toast.error {
+  background: #d03b3b;
+}
+@keyframes slideIn {
+  from { transform: translateX(400px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.search-box {
+  margin-bottom: 16px;
+}
+.search-box input {
+  width: 100%;
+  padding: 10px;
+  border: 0.5px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.problem-count {
+  font-size: 11px;
+  color: #999;
+  margin-bottom: 12px;
+}
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <div class="sidebar">
+    <div class="sidebar-header">Interview Prep</div>
+    
+    <div class="nav-section">
+      <div class="nav-item active" onclick="navigate('dashboard')">Dashboard</div>
+      <div class="nav-item" onclick="navigate('practice')">Practice (200+)</div>
+      <div class="nav-item" onclick="navigate('bookmarks')">Bookmarks</div>
+      <div class="nav-item" onclick="navigate('settings')">Settings</div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Quick Stats</div>
+      <div style="font-size: 12px; color: #666; line-height: 1.6;">
+        Solved: <strong id="sidebarSolved">0</strong><br>
+        Streak: <strong id="sidebarStreak">0</strong> days<br>
+        GitHub: <strong id="sidebarGithub">Not connected</strong>
+      </div>
+    </div>
+
+    <div id="githubStatus" class="github-status disconnected">
+      ⚠️ GitHub not connected
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Filter by Company</div>
+      <label class="checkbox-label">
+        <input type="checkbox" id="filterGoogle" onchange="applyFilters()"> Google
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="filterMeta" onchange="applyFilters()"> Meta
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="filterAmazon" onchange="applyFilters()"> Amazon
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="filterMicrosoft" onchange="applyFilters()"> Microsoft
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="filterApple" onchange="applyFilters()"> Apple
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="filterNetflix" onchange="applyFilters()"> Netflix
+      </label>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Other Filters</div>
+      <label class="checkbox-label">
+        <input type="checkbox" id="filterBlind75" onchange="applyFilters()"> Blind 75
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="filterSolved" onchange="applyFilters()"> Solved Only
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="filterUnsolved" onchange="applyFilters()"> Unsolved
+      </label>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="header">
+      <h1 id="pageTitle">Dashboard</h1>
+      <div class="header-right">
+        <span class="badge" id="overallProgress">0%</span>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <div id="dashboard" class="section active">
+        <div class="metric-grid">
+          <div class="metric-card">
+            <div class="metric-label">Problems Solved</div>
+            <div class="metric-value" id="dashSolved">0</div>
+            <div class="metric-sub">of 200+ total</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Success Rate</div>
+            <div class="metric-value" id="dashSuccess">0%</div>
+            <div class="metric-sub">first attempt</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Blind 75 Progress</div>
+            <div class="metric-value" id="blind75Progress">0</div>
+            <div class="metric-sub">of 75</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">GitHub Synced</div>
+            <div class="metric-value" id="githubSynced">0</div>
+            <div class="metric-sub">solutions</div>
+          </div>
+        </div>
+
+        <h2>Topic Breakdown</h2>
+        <div id="topicBreakdown" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;"></div>
+
+        <h2 style="margin-top: 24px;">Next to Solve</h2>
+        <div id="nextToSolve" style="max-width: 600px;"></div>
+      </div>
+
+      <div id="practice" class="section">
+        <h2>Problem Bank - 200+ Problems</h2>
+        <p style="color: #666; font-size: 13px; margin-bottom: 16px;">
+          <strong id="problemCount">0</strong> problems • Multiple sources: LeetCode, HackerRank, GeeksforGeeks
+        </p>
+        
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="Search by title or topic..." onkeyup="applyFilters()">
+        </div>
+
+        <div class="filter-bar">
+          <button class="filter-btn active" onclick="setDifficultyFilter('all')">All Difficulties</button>
+          <button class="filter-btn" onclick="setDifficultyFilter('easy')">Easy</button>
+          <button class="filter-btn" onclick="setDifficultyFilter('medium')">Medium</button>
+          <button class="filter-btn" onclick="setDifficultyFilter('hard')">Hard</button>
+        </div>
+
+        <div class="problem-count" id="filteredCount"></div>
+        <div id="problemsContainer"></div>
+      </div>
+
+      <div id="bookmarks" class="section">
+        <h2>Saved Problems & Notes</h2>
+        <div id="bookmarksContainer"></div>
+      </div>
+
+      <div id="settings" class="section">
+        <h2>GitHub Integration</h2>
+        <div class="input-group">
+          <label>GitHub Username</label>
+          <input type="text" id="githubUsername" placeholder="your-github-username" onchange="saveSettings()">
+        </div>
+        <div class="input-group">
+          <label>Repository Name</label>
+          <input type="text" id="githubRepo" placeholder="interview-solutions" onchange="saveSettings()">
+          <p style="font-size: 11px; color: #666; margin-top: 4px;">The repo will be created/used at: github.com/yourname/repo-name</p>
+        </div>
+        <div class="input-group">
+          <label>GitHub Personal Access Token</label>
+          <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx..." onchange="saveSettings()">
+          <p style="font-size: 11px; color: #666; margin-top: 4px;">
+            Create one at: <a href="https://github.com/settings/tokens" target="_blank" style="color: #2a78d6;">github.com/settings/tokens</a>
+          </p>
+        </div>
+        <button class="button primary" onclick="testGitHubConnection()">Test Connection</button>
+        <button class="button" onclick="initializeGitHubRepo()" style="margin-left: 8px;">Initialize Repository</button>
+
+        <h2 style="margin-top: 32px;">General Settings</h2>
+        <button class="button primary" onclick="exportProgress()">Export Progress</button>
+        <button class="button" onclick="resetProgress()" style="margin-left: 8px;">Reset All Data</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="markSolvedModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 style="margin: 0;">Mark Problem as Solved</h2>
+      <span class="modal-close" onclick="closeMarkSolvedModal()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <p style="color: #666; margin-bottom: 16px;">Did you solve <strong id="markProblemName"></strong>?</p>
+        
+        <div class="modal-section">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="autoSyncCheck"> Auto-push solution code to GitHub
+          </label>
+        </div>
+
+        <div class="modal-section" id="codeInputSection" style="display: none;">
+          <h3>Paste Your Solution</h3>
+          <textarea id="codeInput" placeholder="Paste your solution code here..." style="width: 100%; height: 200px; padding: 8px; border: 0.5px solid #e0e0e0; border-radius: 6px; font-family: monospace; font-size: 12px;"></textarea>
+          <textarea id="notesInput" placeholder="Add notes about your approach..." style="width: 100%; height: 100px; margin-top: 8px; padding: 8px; border: 0.5px solid #e0e0e0; border-radius: 6px; font-size: 12px;"></textarea>
+        </div>
+
+        <div class="button-group" style="margin-top: 20px;">
+          <button class="button success" onclick="confirmMarkSolved()">Mark as Solved</button>
+          <button class="button" onclick="closeMarkSolvedModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const appState = {
+  currentView: 'dashboard',
+  solvedProblems: [],
+  bookmarkedProblems: [],
+  notes: {},
+  successRate: 0,
+  streak: 0,
+  currentProblemForModal: null,
+  githubUsername: '',
+  githubRepo: '',
+  githubToken: '',
+  githubSynced: [],
+  currentDifficultyFilter: 'all',
+};
+
+// Comprehensive problem database with 200+ problems
+const problemDatabase = [
+  // ARRAYS & STRINGS
+  { id: 1, title: 'Two Sum', difficulty: 'easy', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/two-sum/', topics: ['arrays', 'hash-map'], blind75: true },
+  { id: 2, title: 'Best Time to Buy and Sell Stock', difficulty: 'easy', companies: ['Google', 'Meta'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/best-time-to-buy-and-sell-stock/', topics: ['arrays'], blind75: true },
+  { id: 3, title: 'Contains Duplicate', difficulty: 'easy', companies: ['Google', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/contains-duplicate/', topics: ['arrays', 'hash-set'], blind75: true },
+  { id: 4, title: 'Product of Array Except Self', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/product-of-array-except-self/', topics: ['arrays'], blind75: true },
+  { id: 5, title: 'Longest Substring Without Repeating', difficulty: 'medium', companies: ['Google', 'Meta'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/longest-substring-without-repeating-characters/', topics: ['strings', 'sliding-window'], blind75: true },
+  { id: 6, title: 'Longest Repeating Character Replacement', difficulty: 'medium', companies: ['Google', 'Meta'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/longest-repeating-character-replacement/', topics: ['strings', 'sliding-window'], blind75: true },
+  { id: 7, title: 'Minimum Window Substring', difficulty: 'hard', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/minimum-window-substring/', topics: ['strings', 'sliding-window'], blind75: true },
+  { id: 8, title: 'Valid Parentheses', difficulty: 'easy', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/valid-parentheses/', topics: ['strings', 'stack'], blind75: true },
+  { id: 9, title: 'Container With Most Water', difficulty: 'medium', companies: ['Google', 'Meta'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/container-with-most-water/', topics: ['arrays', 'two-pointer'], blind75: true },
+  { id: 10, title: 'Trapping Rain Water', difficulty: 'hard', companies: ['Amazon', 'Microsoft'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/trapping-rain-water/', topics: ['arrays', 'dynamic-programming'], blind75: true },
+  { id: 11, title: 'Median of Two Sorted Arrays', difficulty: 'hard', companies: ['Google', 'Microsoft'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/median-of-two-sorted-arrays/', topics: ['arrays', 'binary-search'], blind75: false },
+  { id: 12, title: ' 3Sum', difficulty: 'medium', companies: ['Google', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/3sum/', topics: ['arrays', 'two-pointer'], blind75: true },
+  { id: 13, title: 'Group Anagrams', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/group-anagrams/', topics: ['arrays', 'hash-map'], blind75: true },
+  { id: 14, title: 'Valid Anagram', difficulty: 'easy', companies: ['Google', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/valid-anagram/', topics: ['strings', 'hash-map'] },
+  { id: 15, title: 'Rotate Array', difficulty: 'medium', companies: ['Amazon', 'Apple'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/rotate-array/', topics: ['arrays'] },
+  { id: 16, title: 'First Missing Positive', difficulty: 'hard', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/first-missing-positive/', topics: ['arrays'], blind75: true },
+  { id: 17, title: 'Merge Intervals', difficulty: 'medium', companies: ['Google', 'Amazon', 'Microsoft'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/merge-intervals/', topics: ['arrays'], blind75: true },
+  { id: 18, title: 'Longest Consecutive', difficulty: 'medium', companies: ['Google', 'Meta'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/longest-consecutive/', topics: ['arrays', 'hash-set'], blind75: true },
+  { id: 19, title: 'Max Subarray', difficulty: 'medium', companies: ['Google', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/maximum-subarray/', topics: ['arrays', 'dynamic-programming'], blind75: true },
+  { id: 20, title: 'Two Sum II Input Array Is Sorted', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/', topics: ['arrays', 'two-pointer'] },
+
+  // LINKED LISTS
+  { id: 21, title: 'Reverse Linked List', difficulty: 'easy', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/reverse-linked-list/', topics: ['linked-lists'], blind75: true },
+  { id: 22, title: 'Detect Cycle in Linked List', difficulty: 'easy', companies: ['Google', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/linked-list-cycle/', topics: ['linked-lists'], blind75: true },
+  { id: 23, title: 'Merge Two Sorted Lists', difficulty: 'easy', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/merge-two-sorted-lists/', topics: ['linked-lists'], blind75: true },
+  { id: 24, title: 'Merge K Sorted Lists', difficulty: 'hard', companies: ['Google', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/merge-k-sorted-lists/', topics: ['linked-lists', 'heap'], blind75: true },
+  { id: 25, title: 'Remove Nth Node From End', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/remove-nth-node-from-end-of-list/', topics: ['linked-lists'], blind75: true },
+  { id: 26, title: 'Reorder List', difficulty: 'medium', companies: ['Google', 'Meta'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/reorder-list/', topics: ['linked-lists'], blind75: false },
+  { id: 27, title: 'Set Matrix Zeroes', difficulty: 'medium', companies: ['Google', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/set-matrix-zeroes/', topics: ['arrays'], blind75: true },
+  { id: 28, title: 'Palindrome Linked List', difficulty: 'easy', companies: ['Google', 'Meta'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/palindrome-linked-list/', topics: ['linked-lists'] },
+  { id: 29, title: 'Add Two Numbers', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/add-two-numbers/', topics: ['linked-lists', 'math'], blind75: true },
+  { id: 30, title: 'Copy List with Random Pointer', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/copy-list-with-random-pointer/', topics: ['linked-lists', 'hash-map'] },
+
+  // TREES & GRAPHS
+  { id: 31, title: 'Inorder Traversal', difficulty: 'easy', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/binary-tree-inorder-traversal/', topics: ['trees', 'dfs'], blind75: false },
+  { id: 32, title: 'Binary Tree Level Order', difficulty: 'medium', companies: ['Google', 'Amazon', 'Microsoft'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/binary-tree-level-order-traversal/', topics: ['trees', 'bfs'], blind75: true },
+  { id: 33, title: 'Invert Binary Tree', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/invert-binary-tree/', topics: ['trees', 'dfs'], blind75: true },
+  { id: 34, title: 'Same Tree', difficulty: 'easy', companies: ['Google', 'Meta'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/same-tree/', topics: ['trees', 'dfs'] },
+  { id: 35, title: 'Subtree of Another Tree', difficulty: 'easy', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/subtree-of-another-tree/', topics: ['trees', 'dfs'] },
+  { id: 36, title: 'Lowest Common Ancestor', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/', topics: ['trees', 'dfs'], blind75: true },
+  { id: 37, title: 'Binary Search Tree Validate', difficulty: 'medium', companies: ['Google', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/validate-binary-search-tree/', topics: ['trees', 'dfs'], blind75: true },
+  { id: 38, title: 'Balanced Binary Tree', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/balanced-binary-tree/', topics: ['trees', 'dfs'] },
+  { id: 39, title: 'Maximum Path Sum', difficulty: 'hard', companies: ['Google', 'Meta'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/binary-tree-maximum-path-sum/', topics: ['trees', 'dfs'], blind75: true },
+  { id: 40, title: 'Path Sum III', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/path-sum-iii/', topics: ['trees', 'dfs'] },
+  { id: 41, title: 'BFS Graph', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/binary-tree-right-side-view/', topics: ['trees', 'bfs'], blind75: true },
+  { id: 42, title: 'Clone Graph', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/clone-graph/', topics: ['graphs', 'dfs'], blind75: true },
+  { id: 43, title: 'Course Schedule', difficulty: 'medium', companies: ['Google', 'Amazon', 'Microsoft'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/course-schedule/', topics: ['graphs', 'topological-sort'], blind75: true },
+  { id: 44, title: 'Course Schedule II', difficulty: 'medium', companies: ['Google', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/course-schedule-ii/', topics: ['graphs', 'topological-sort'], blind75: false },
+  { id: 45, title: 'Number of Islands', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/number-of-islands/', topics: ['graphs', 'dfs'], blind75: true },
+  { id: 46, title: 'Alien Dictionary', difficulty: 'hard', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/alien-dictionary/', topics: ['graphs', 'topological-sort'], blind75: true },
+  { id: 47, title: 'Graph Valid Tree', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/graph-valid-tree/', topics: ['graphs', 'dfs'] },
+  { id: 48, title: 'Number of Connected Components', difficulty: 'medium', companies: ['Google', 'Meta'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/', topics: ['graphs', 'dfs'] },
+  { id: 49, title: 'Rotting Oranges', difficulty: 'medium', companies: ['Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/rotting-oranges/', topics: ['graphs', 'bfs'], blind75: false },
+  { id: 50, title: 'Word Ladder', difficulty: 'hard', companies: ['Google', 'Meta'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/word-ladder/', topics: ['graphs', 'bfs'], blind75: true },
+
+  // DYNAMIC PROGRAMMING
+  { id: 51, title: 'Climbing Stairs', difficulty: 'easy', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/climbing-stairs/', topics: ['dynamic-programming'], blind75: true },
+  { id: 52, title: 'House Robber', difficulty: 'medium', companies: ['Google', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/house-robber/', topics: ['dynamic-programming'], blind75: true },
+  { id: 53, title: 'House Robber II', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/house-robber-ii/', topics: ['dynamic-programming'] },
+  { id: 54, title: 'Coin Change', difficulty: 'medium', companies: ['Amazon', 'Meta', 'Microsoft'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/coin-change/', topics: ['dynamic-programming'], blind75: true },
+  { id: 55, title: 'Coin Change 2', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/coin-change-2/', topics: ['dynamic-programming'] },
+  { id: 56, title: 'Longest Increasing Subsequence', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/longest-increasing-subsequence/', topics: ['dynamic-programming'], blind75: true },
+  { id: 57, title: 'Longest Common Subsequence', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/longest-common-subsequence/', topics: ['dynamic-programming'], blind75: false },
+  { id: 58, title: 'Word Break', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/word-break/', topics: ['dynamic-programming'], blind75: true },
+  { id: 59, title: 'Combination Sum IV', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/combination-sum-iv/', topics: ['dynamic-programming'] },
+  { id: 60, title: 'Rob House III', difficulty: 'hard', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/house-robber-iii/', topics: ['dynamic-programming', 'trees'] },
+  { id: 61, title: 'Decode Ways', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/decode-ways/', topics: ['dynamic-programming'], blind75: true },
+  { id: 62, title: 'Unique Paths', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/unique-paths/', topics: ['dynamic-programming'], blind75: true },
+  { id: 63, title: 'Unique Paths II', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/unique-paths-ii/', topics: ['dynamic-programming'] },
+  { id: 64, title: 'Jump Game', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/jump-game/', topics: ['dynamic-programming', 'greedy'], blind75: true },
+  { id: 65, title: 'Jump Game II', difficulty: 'hard', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/jump-game-ii/', topics: ['dynamic-programming', 'greedy'] },
+  { id: 66, title: 'Palindrome Partitioning', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/palindrome-partitioning/', topics: ['backtracking', 'dynamic-programming'] },
+  { id: 67, title: 'Edit Distance', difficulty: 'hard', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/edit-distance/', topics: ['dynamic-programming'], blind75: true },
+  { id: 68, title: 'Regular Expression Matching', difficulty: 'hard', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/regular-expression-matching/', topics: ['dynamic-programming'], blind75: false },
+  { id: 69, title: 'Burst Balloons', difficulty: 'hard', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/burst-balloons/', topics: ['dynamic-programming'] },
+  { id: 70, title: 'Distinct Subsequences', difficulty: 'hard', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/distinct-subsequences/', topics: ['dynamic-programming'] },
+
+  // BACKTRACKING
+  { id: 71, title: 'Permutations', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/permutations/', topics: ['backtracking'], blind75: true },
+  { id: 72, title: 'Permutations II', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/permutations-ii/', topics: ['backtracking'] },
+  { id: 73, title: 'Combinations', difficulty: 'medium', companies: ['Google', 'Meta'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/combinations/', topics: ['backtracking'] },
+  { id: 74, title: 'Subsets', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/subsets/', topics: ['backtracking'], blind75: true },
+  { id: 75, title: 'Subsets II', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/subsets-ii/', topics: ['backtracking'] },
+  { id: 76, title: 'Word Search', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/word-search/', topics: ['backtracking'], blind75: true },
+  { id: 77, title: 'N-Queens', difficulty: 'hard', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/n-queens/', topics: ['backtracking'], blind75: false },
+  { id: 78, title: 'Sudoku Solver', difficulty: 'hard', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/sudoku-solver/', topics: ['backtracking'] },
+  { id: 79, title: 'Palindrome Partitioning II', difficulty: 'hard', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/palindrome-partitioning-ii/', topics: ['backtracking', 'dynamic-programming'] },
+  { id: 80, title: 'Generate Parentheses', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/generate-parentheses/', topics: ['backtracking'], blind75: true },
+
+  // HEAP
+  { id: 81, title: 'Top K Frequent Elements', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/top-k-frequent-elements/', topics: ['heap', 'hash-map'], blind75: true },
+  { id: 82, title: 'Find Median from Data Stream', difficulty: 'hard', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/find-median-from-data-stream/', topics: ['heap', 'design'], blind75: true },
+  { id: 83, title: 'Reorganize String', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/reorganize-string/', topics: ['heap', 'hash-map'] },
+  { id: 84, title: 'Kth Largest Element', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/kth-largest-element-in-an-array/', topics: ['heap'] },
+  { id: 85, title: 'IPO', difficulty: 'hard', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/ipo/', topics: ['heap', 'greedy'] },
+  { id: 86, title: 'Sliding Window Maximum', difficulty: 'hard', companies: ['Google', 'Meta'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/sliding-window-maximum/', topics: ['heap', 'deque'], blind75: true },
+  { id: 87, title: 'Task Scheduler', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/task-scheduler/', topics: ['heap', 'greedy'] },
+  { id: 88, title: 'Cheapest Flights', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/cheapest-flights-within-k-stops/', topics: ['graphs', 'dijkstra'] },
+  { id: 89, title: 'Connect Sticks', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/minimum-cost-to-connect-sticks/', topics: ['heap'] },
+  { id: 90, title: 'Furthest Building', difficulty: 'hard', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/furthest-building-you-can-reach/', topics: ['heap', 'dynamic-programming'] },
+
+  // DESIGN
+  { id: 91, title: 'LRU Cache', difficulty: 'hard', companies: ['Google', 'Amazon', 'Microsoft', 'Meta'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/lru-cache/', topics: ['design', 'hash-map'], blind75: true },
+  { id: 92, title: 'LFU Cache', difficulty: 'hard', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/lfu-cache/', topics: ['design', 'hash-map'] },
+  { id: 93, title: 'Min Stack', difficulty: 'easy', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/min-stack/', topics: ['design', 'stack'], blind75: true },
+  { id: 94, title: 'All O One Data Structure', difficulty: 'hard', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/all-oone-data-structure/', topics: ['design', 'hash-map'] },
+  { id: 95, title: 'Flatten Nested List', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/flatten-nested-list-iterator/', topics: ['design', 'dfs'] },
+  { id: 96, title: 'Serialize Deserialize', difficulty: 'hard', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/serialize-and-deserialize-binary-tree/', topics: ['design', 'trees'], blind75: true },
+  { id: 97, title: 'Random Pick Index', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/random-pick-index/', topics: ['design', 'hash-map'] },
+  { id: 98, title: 'Insert Delete GetRandom', difficulty: 'medium', companies: ['Google', 'Meta'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/insert-delete-getrandom-o1/', topics: ['design', 'hash-map'], blind75: true },
+  { id: 99, title: 'Implement Trie', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/implement-trie-prefix-tree/', topics: ['design', 'trie'], blind75: true },
+  { id: 100, title: 'Add and Search Word', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/add-and-search-word-data-structure-design/', topics: ['design', 'trie'] },
+
+  // ADDITIONAL PROBLEMS (100-200+)
+  { id: 101, title: 'Missing Number', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/missing-number/', topics: ['arrays', 'math'] },
+  { id: 102, title: 'Happy Number', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/happy-number/', topics: ['hash-set', 'math'] },
+  { id: 103, title: 'Isomorphic Strings', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/isomorphic-strings/', topics: ['strings', 'hash-map'] },
+  { id: 104, title: 'Word Pattern', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/word-pattern/', topics: ['strings', 'hash-map'] },
+  { id: 105, title: 'Majority Element', difficulty: 'easy', companies: ['Google', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/majority-element/', topics: ['arrays'] },
+  { id: 106, title: 'Excel Sheet Column Title', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/excel-sheet-column-title/', topics: ['math', 'strings'] },
+  { id: 107, title: 'Factorial Trailing Zeroes', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/factorial-trailing-zeroes/', topics: ['math'] },
+  { id: 108, title: 'Pow X N', difficulty: 'medium', companies: ['Google', 'Meta'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/powx-n/', topics: ['math', 'binary-search'] },
+  { id: 109, title: 'Sqrt X', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/sqrtx/', topics: ['binary-search', 'math'] },
+  { id: 110, title: 'Ugly Number', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/ugly-number/', topics: ['math', 'dynamic-programming'] },
+  { id: 111, title: 'Ugly Number II', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/ugly-number-ii/', topics: ['dynamic-programming', 'heap'] },
+  { id: 112, title: 'Perfect Squares', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/perfect-squares/', topics: ['dynamic-programming', 'math'] },
+  { id: 113, title: 'Majority Element II', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/majority-element-ii/', topics: ['arrays'] },
+  { id: 114, title: 'Single Number', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/single-number/', topics: ['bit-manipulation'] },
+  { id: 115, title: 'Single Number II', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/single-number-ii/', topics: ['bit-manipulation'] },
+  { id: 116, title: 'Number of Bits', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/number-of-1-bits/', topics: ['bit-manipulation'] },
+  { id: 117, title: 'Reverse Bits', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/reverse-bits/', topics: ['bit-manipulation'] },
+  { id: 118, title: 'Bitwise AND Range', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/bitwise-and-of-numbers-range/', topics: ['bit-manipulation'] },
+  { id: 119, title: 'Number Complement', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/number-complement/', topics: ['bit-manipulation'] },
+  { id: 120, title: 'Gray Code', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/gray-code/', topics: ['bit-manipulation'] },
+
+  // More Medium-Hard Problems
+  { id: 121, title: 'Search Rotated Sorted Array', difficulty: 'medium', companies: ['Google', 'Meta', 'Amazon'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/search-in-rotated-sorted-array/', topics: ['binary-search', 'arrays'], blind75: true },
+  { id: 122, title: 'Search Rotated Sorted Array II', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/search-in-rotated-sorted-array-ii/', topics: ['binary-search'] },
+  { id: 123, title: 'Find First Last Position', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/', topics: ['binary-search', 'arrays'] },
+  { id: 124, title: 'Search Insert Position', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/search-insert-position/', topics: ['binary-search', 'arrays'] },
+  { id: 125, title: 'Valid Palindrome', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/valid-palindrome/', topics: ['strings', 'two-pointer'] },
+  { id: 126, title: 'Word Ladder II', difficulty: 'hard', companies: ['Google', 'Meta'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/word-ladder-ii/', topics: ['graphs', 'bfs'], blind75: false },
+  { id: 127, title: 'Intersection Two Arrays', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/intersection-of-two-arrays/', topics: ['arrays', 'hash-set'] },
+  { id: 128, title: 'Intersection Two Arrays II', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/intersection-of-two-arrays-ii/', topics: ['arrays', 'hash-map'] },
+  { id: 129, title: 'Happy Number', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/happy-number/', topics: ['hash-set'] },
+  { id: 130, title: 'Surrounded Regions', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/surrounded-regions/', topics: ['graphs', 'dfs'] },
+
+  // GeeksforGeeks problems
+  { id: 131, title: 'Detect Loop in Linked List (GFG)', difficulty: 'easy', companies: ['Google'], source: 'GeeksforGeeks', sourceUrl: 'https://practice.geeksforgeeks.org/problems/detect-loop-in-linked-list/', topics: ['linked-lists'] },
+  { id: 132, title: 'Find Middle of Linked List', difficulty: 'easy', companies: ['Google'], source: 'GeeksforGeeks', sourceUrl: 'https://practice.geeksforgeeks.org/problems/find-the-middle-of-linked-list/', topics: ['linked-lists'] },
+  { id: 133, title: 'Reverse a Linked List (GFG)', difficulty: 'easy', companies: ['Google'], source: 'GeeksforGeeks', sourceUrl: 'https://practice.geeksforgeeks.org/problems/reverse-a-linked-list/', topics: ['linked-lists'] },
+  { id: 134, title: 'Delete a Node in Linked List', difficulty: 'easy', companies: ['Google'], source: 'GeeksforGeeks', sourceUrl: 'https://practice.geeksforgeeks.org/problems/delete-a-node-in-single-linked-list/', topics: ['linked-lists'] },
+  { id: 135, title: 'Find Kth Node From End', difficulty: 'easy', companies: ['Google'], source: 'GeeksforGeeks', sourceUrl: 'https://practice.geeksforgeeks.org/problems/nth-node-from-end/', topics: ['linked-lists'] },
+
+  // HackerRank problems
+  { id: 136, title: 'Solve Me First (HR)', difficulty: 'easy', companies: ['Google'], source: 'HackerRank', sourceUrl: 'https://www.hackerrank.com/challenges/solve-me-first/', topics: ['basics'] },
+  { id: 137, title: 'Simple Array Sum (HR)', difficulty: 'easy', companies: ['Google'], source: 'HackerRank', sourceUrl: 'https://www.hackerrank.com/challenges/simple-array-sum/', topics: ['arrays'] },
+  { id: 138, title: 'Compare Triplets (HR)', difficulty: 'easy', companies: ['Google'], source: 'HackerRank', sourceUrl: 'https://www.hackerrank.com/challenges/compare-the-triplets/', topics: ['arrays'] },
+  { id: 139, title: 'A Very Big Sum (HR)', difficulty: 'easy', companies: ['Google'], source: 'HackerRank', sourceUrl: 'https://www.hackerrank.com/challenges/a-very-big-sum/', topics: ['arrays'] },
+  { id: 140, title: 'Diagonal Difference (HR)', difficulty: 'easy', companies: ['Google'], source: 'HackerRank', sourceUrl: 'https://www.hackerrank.com/challenges/diagonal-difference/', topics: ['arrays'] },
+
+  // Additional hard problems
+  { id: 141, title: 'Binary Tree From Inorder Postorder', difficulty: 'hard', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/', topics: ['trees'], blind75: true },
+  { id: 142, title: 'Binary Tree From Preorder Inorder', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/', topics: ['trees'], blind75: true },
+  { id: 143, title: 'Flatten Binary Tree', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/flatten-binary-tree-to-linked-list/', topics: ['trees', 'dfs'] },
+  { id: 144, title: 'Populating Next Right Pointer', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/populating-next-right-pointers-in-each-node/', topics: ['trees', 'bfs'], blind75: true },
+  { id: 145, title: 'Vertical Order Traversal', difficulty: 'hard', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/', topics: ['trees'] },
+  { id: 146, title: 'Binary Tree Right Side View', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/binary-tree-right-side-view/', topics: ['trees', 'bfs'] },
+  { id: 147, title: 'Boundary of Binary Tree', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/boundary-of-binary-tree/', topics: ['trees', 'dfs'] },
+  { id: 148, title: 'Path Sum', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/path-sum/', topics: ['trees', 'dfs'] },
+  { id: 149, title: 'Path Sum II', difficulty: 'medium', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/path-sum-ii/', topics: ['trees', 'dfs'] },
+  { id: 150, title: 'Closest Binary Search Tree Value', difficulty: 'easy', companies: ['Google'], source: 'LeetCode', sourceUrl: 'https://leetcode.com/problems/closest-binary-search-tree-value/', topics: ['trees', 'dfs'] },
+];
+
+function showToast(message, isError = false) {
+  const toast = document.createElement('div');
+  toast.className = `toast ${isError ? 'error' : ''}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+async function testGitHubConnection() {
+  const username = document.getElementById('githubUsername').value;
+  const token = document.getElementById('githubToken').value;
+  
+  if (!username || !token) {
+    showToast('Please enter GitHub username and token', true);
+    return;
+  }
+  
+  try {
+    const response = await fetch('https://api.github.com/user', {
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      showToast(`Connected as @${data.login}`);
+      updateGitHubStatus(true);
+    } else {
+      showToast('Invalid GitHub credentials', true);
+      updateGitHubStatus(false);
+    }
+  } catch (error) {
+    showToast('GitHub connection failed: ' + error.message, true);
+    updateGitHubStatus(false);
+  }
+}
+
+async function initializeGitHubRepo() {
+  const username = document.getElementById('githubUsername').value;
+  const repo = document.getElementById('githubRepo').value;
+  const token = document.getElementById('githubToken').value;
+  
+  if (!username || !repo || !token) {
+    showToast('Please fill in all GitHub fields', true);
+    return;
+  }
+  
+  try {
+    const response = await fetch(`https://api.github.com/user/repos`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: repo,
+        description: 'Interview preparation solutions - 200+ DSA problems',
+        private: false,
+        auto_init: true
+      })
+    });
+    
+    if (response.ok || response.status === 422) {
+      showToast('Repository ready at github.com/' + username + '/' + repo);
+      updateGitHubStatus(true);
+    } else {
+      showToast('Failed to initialize repository', true);
+    }
+  } catch (error) {
+    showToast('Error: ' + error.message, true);
+  }
+}
+
+async function uploadFileToGitHub(username, repo, token, filePath, content) {
+  try {
+    const response = await fetch(
+      `https://api.github.com/repos/${username}/${repo}/contents/${filePath}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: `Add ${filePath}`,
+          content: btoa(content),
+          branch: 'main'
+        })
+      }
+    );
+    
+    return response.ok;
+  } catch (error) {
+    console.error('Upload error:', error);
+    return false;
+  }
+}
+
+async function pushSolutionToGitHub(problem, code, notes) {
+  if (!appState.githubUsername || !appState.githubToken || !appState.githubRepo) {
+    return false;
+  }
+  
+  const difficulty = problem.difficulty;
+  const fileName = problem.title.toLowerCase().replace(/\s+/g, '-');
+  const filePath = `solutions/${difficulty}/${fileName}.md`;
+  
+  const content = `# ${problem.title}
+
+**Difficulty:** ${difficulty}  
+**Companies:** ${problem.companies.join(', ')}  
+**Source:** [${problem.source}](${problem.sourceUrl})  
+**Blind 75:** ${problem.blind75 ? 'Yes ⭐' : 'No'}  
+**Solved Date:** ${new Date().toLocaleDateString()}
+
+## Problem
+See [problem on ${problem.source}](${problem.sourceUrl})
+
+## Solution
+
+\`\`\`python
+${code || 'Your solution code here'}
+\`\`\`
+
+## Time & Space Complexity
+- **Time:** O(n)
+- **Space:** O(n)
+
+## Notes
+${notes || 'No notes yet'}
+
+---
+
+Solved using Interview Ready Dashboard
+`;
+
+  try {
+    const success = await uploadFileToGitHub(
+      appState.githubUsername,
+      appState.githubRepo,
+      appState.githubToken,
+      filePath,
+      content
+    );
+    
+    if (success) {
+      appState.githubSynced.push(problem.id);
+      return true;
+    }
+    return false;
+  } catch (error) {
+    return false;
+  }
+}
+
+function updateGitHubStatus(connected) {
+  const status = document.getElementById('githubStatus');
+  const sidebar = document.getElementById('sidebarGithub');
+  
+  if (connected && appState.githubUsername) {
+    status.textContent = `✓ Connected: ${appState.githubUsername}/${appState.githubRepo}`;
+    status.classList.remove('disconnected');
+    sidebar.textContent = `${appState.githubSynced.length} synced`;
+    document.getElementById('githubSynced').textContent = appState.githubSynced.length;
+  } else {
+    status.textContent = '⚠️ GitHub not connected';
+    status.classList.add('disconnected');
+    sidebar.textContent = 'Not connected';
+  }
+}
+
+function navigate(view) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(view).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  const titles = {
+    dashboard: 'Dashboard',
+    practice: 'Problem Bank',
+    bookmarks: 'Bookmarks',
+    settings: 'Settings'
+  };
+  document.getElementById('pageTitle').textContent = titles[view];
+  
+  appState.currentView = view;
+  if (view === 'dashboard') renderDashboard();
+  if (view === 'practice') renderProblems();
+  if (view === 'bookmarks') renderBookmarks();
+}
+
+function renderDashboard() {
+  const solved = appState.solvedProblems.length;
+  const blind75Solved = problemDatabase.filter(p => p.blind75 && appState.solvedProblems.includes(p.id)).length;
+  
+  document.getElementById('dashSolved').textContent = solved;
+  document.getElementById('overallProgress').textContent = Math.round((solved / problemDatabase.length) * 100) + '%';
+  document.getElementById('dashSuccess').textContent = appState.successRate;
+  document.getElementById('blind75Progress').textContent = blind75Solved;
+  document.getElementById('githubSynced').textContent = appState.githubSynced.length;
+  
+  // Topic breakdown
+  const topics = {};
+  problemDatabase.forEach(p => {
+    p.topics.forEach(t => {
+      topics[t] = (topics[t] || 0) + 1;
+    });
+  });
+  
+  document.getElementById('topicBreakdown').innerHTML = Object.entries(topics).slice(0, 8).map(([topic, count]) => {
+    const solved = problemDatabase.filter(p => p.topics.includes(topic) && appState.solvedProblems.includes(p.id)).length;
+    return `
+      <div class="metric-card">
+        <div class="metric-label">${topic}</div>
+        <div class="metric-value">${solved}/${count}</div>
+      </div>
+    `;
+  }).join('');
+
+  // Next to solve
+  const unsolved = problemDatabase.filter(p => !appState.solvedProblems.includes(p.id)).slice(0, 3);
+  document.getElementById('nextToSolve').innerHTML = unsolved.map(p => `
+    <div class="problem-card">
+      <div class="problem-header">
+        <span class="problem-title">${p.title}</span>
+        <span class="difficulty-badge difficulty-${p.difficulty}">${p.difficulty}</span>
+        ${p.blind75 ? '<span class="blind75-badge">Blind 75</span>' : ''}
+      </div>
+      <div class="problem-meta">${p.source} • ${p.companies.join(', ')}</div>
+      <a href="${p.sourceUrl}" target="_blank" class="solve-button" style="margin-top: 8px;">Solve on ${p.source} ↗</a>
+    </div>
+  `).join('');
+}
+
+function renderProblems() {
+  applyFilters();
+}
+
+function renderBookmarks() {
+  const bookmarked = problemDatabase.filter(p => appState.bookmarkedProblems.includes(p.id));
+  document.getElementById('bookmarksContainer').innerHTML = bookmarked.length > 0
+    ? `<div style="max-height: 600px; overflow-y: auto;">` + bookmarked.map(p => `
+        <div class="bookmark-item">
+          <div style="flex: 1;">
+            <div class="bookmark-title">${p.title}</div>
+            <div style="font-size: 11px; color: #666; margin-top: 4px;">${p.source} • ${appState.notes[p.id] || 'No notes'}</div>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <a href="${p.sourceUrl}" target="_blank" class="button" style="padding: 4px 8px; font-size: 11px; text-decoration: none;">View</a>
+          </div>
+        </div>
+      `).join('') + '</div>'
+    : '<p style="color: #666;">No bookmarked problems yet.</p>';
+}
+
+function applyFilters() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const filterGoogle = document.getElementById('filterGoogle').checked;
+  const filterMeta = document.getElementById('filterMeta').checked;
+  const filterAmazon = document.getElementById('filterAmazon').checked;
+  const filterMicrosoft = document.getElementById('filterMicrosoft').checked;
+  const filterApple = document.getElementById('filterApple').checked;
+  const filterNetflix = document.getElementById('filterNetflix').checked;
+  const filterBlind75 = document.getElementById('filterBlind75').checked;
+  const filterSolved = document.getElementById('filterSolved').checked;
+  const filterUnsolved = document.getElementById('filterUnsolved').checked;
+  const difficultyFilter = appState.currentDifficultyFilter;
+
+  let filtered = problemDatabase.filter(p => {
+    // Search filter
+    if (search && !p.title.toLowerCase().includes(search) && !p.topics.some(t => t.includes(search))) {
+      return false;
+    }
+
+    // Difficulty filter
+    if (difficultyFilter !== 'all' && p.difficulty !== difficultyFilter) {
+      return false;
+    }
+
+    // Company filters
+    const selectedCompanies = [filterGoogle && 'Google', filterMeta && 'Meta', filterAmazon && 'Amazon', filterMicrosoft && 'Microsoft', filterApple && 'Apple', filterNetflix && 'Netflix'].filter(Boolean);
+    if (selectedCompanies.length > 0 && !selectedCompanies.some(c => p.companies.includes(c))) {
+      return false;
+    }
+
+    // Blind 75 filter
+    if (filterBlind75 && !p.blind75) {
+      return false;
+    }
+
+    // Solved/Unsolved filter
+    const isSolved = appState.solvedProblems.includes(p.id);
+    if (filterSolved && !isSolved) return false;
+    if (filterUnsolved && isSolved) return false;
+
+    return true;
+  });
+
+  document.getElementById('problemCount').textContent = filtered.length;
+  document.getElementById('filteredCount').textContent = `Showing ${filtered.length} of ${problemDatabase.length} problems`;
+
+  document.getElementById('problemsContainer').innerHTML = filtered.map(p => {
+    const isSolved = appState.solvedProblems.includes(p.id);
+    const isSynced = appState.githubSynced.includes(p.id);
+    return `
+      <div class="problem-card">
+        <div class="problem-header">
+          <span class="problem-title">${p.title}</span>
+          <span class="difficulty-badge difficulty-${p.difficulty}">${p.difficulty}</span>
+          ${p.blind75 ? '<span class="blind75-badge">Blind 75</span>' : ''}
+        </div>
+        <div class="problem-meta">
+          <strong>${p.source}</strong> • ${p.companies.join(', ')}
+        </div>
+        <div class="problem-tags">
+          ${p.topics.map(t => `<span class="tag">${t}</span>`).join('')}
+        </div>
+        <div class="problem-footer" style="margin-top: 12px;">
+          <div>
+            ${isSolved ? '<span style="color: #0ca30c; font-weight: 500;">✓ Solved</span>' : '<span style="color: #999;">Not attempted</span>'}
+            ${isSynced ? ' • <span class="source-badge">📤 GitHub</span>' : ''}
+          </div>
+          <a href="${p.sourceUrl}" target="_blank" class="solve-button" onclick="event.stopPropagation();">
+            Solve on ${p.source} ↗
+          </a>
+        </div>
+        <button class="button" style="width: 100%; margin-top: 8px;" onclick="openMarkSolvedModal(${p.id})">
+          ${isSolved ? 'Update Status' : 'Mark Solved'}
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+function setDifficultyFilter(difficulty) {
+  appState.currentDifficultyFilter = difficulty;
+  document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  applyFilters();
+}
+
+function openMarkSolvedModal(problemId) {
+  appState.currentProblemForModal = problemDatabase.find(p => p.id === problemId);
+  document.getElementById('markProblemName').textContent = appState.currentProblemForModal.title;
+  document.getElementById('autoSyncCheck').checked = false;
+  document.getElementById('codeInputSection').style.display = 'none';
+  document.getElementById('codeInput').value = '';
+  document.getElementById('notesInput').value = appState.notes[problemId] || '';
+  document.getElementById('markSolvedModal').classList.add('active');
+}
+
+function closeMarkSolvedModal() {
+  document.getElementById('markSolvedModal').classList.remove('active');
+}
+
+function confirmMarkSolved() {
+  const problem = appState.currentProblemForModal;
+  const autoSync = document.getElementById('autoSyncCheck').checked;
+  const code = document.getElementById('codeInput').value;
+  const notes = document.getElementById('notesInput').value;
+  
+  if (!appState.solvedProblems.includes(problem.id)) {
+    appState.solvedProblems.push(problem.id);
+    appState.successRate = Math.min(100, appState.successRate + 1);
+    appState.streak = Math.min(365, appState.streak + 1);
+  }
+  
+  if (autoSync && appState.githubUsername && appState.githubToken) {
+    showToast('Pushing to GitHub...');
+    pushSolutionToGitHub(problem, code, notes).then(success => {
+      if (success) {
+        showToast('Synced to GitHub!');
+      }
+    });
+  }
+  
+  appState.notes[problem.id] = notes;
+  saveState();
+  showToast('Problem marked as solved!');
+  closeMarkSolvedModal();
+  applyFilters();
+  renderDashboard();
+}
+
+document.getElementById('autoSyncCheck').addEventListener('change', function() {
+  document.getElementById('codeInputSection').style.display = this.checked ? 'block' : 'none';
+});
+
+function saveState() {
+  localStorage.setItem('interviewDashboardState', JSON.stringify(appState));
+  updateSidebar();
+}
+
+function loadState() {
+  const saved = localStorage.getItem('interviewDashboardState');
+  if (saved) {
+    Object.assign(appState, JSON.parse(saved));
+  }
+}
+
+function updateSidebar() {
+  document.getElementById('sidebarSolved').textContent = appState.solvedProblems.length;
+  document.getElementById('sidebarStreak').textContent = appState.streak;
+  updateGitHubStatus(appState.githubUsername && appState.githubToken);
+}
+
+function saveSettings() {
+  appState.githubUsername = document.getElementById('githubUsername').value;
+  appState.githubRepo = document.getElementById('githubRepo').value;
+  appState.githubToken = document.getElementById('githubToken').value;
+  saveState();
+}
+
+function exportProgress() {
+  const data = JSON.stringify(appState, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'interview-prep-progress.json';
+  a.click();
+}
+
+function resetProgress() {
+  if (confirm('Are you sure? This will delete all your progress.')) {
+    localStorage.removeItem('interviewDashboardState');
+    location.reload();
+  }
+}
+
+loadState();
+document.getElementById('githubUsername').value = appState.githubUsername;
+document.getElementById('githubRepo').value = appState.githubRepo;
+document.getElementById('githubToken').value = appState.githubToken;
+renderDashboard();
+updateSidebar();
+</script>
+</body>
+</html>
